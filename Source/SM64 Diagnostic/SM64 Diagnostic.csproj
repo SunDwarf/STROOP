@@ -9,7 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SM64_Diagnostic</RootNamespace>
     <AssemblyName>STROOP</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition=" '$(OS)' == 'Unix' ">v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition=" '$(OS)' != 'Unix' ">v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -89,6 +90,11 @@
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference
+            Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51"
+            Condition=" '$(OS)' == 'Unix'">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -494,14 +500,24 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>del "$(TargetDir)OpenTK.dll.config"
+    <PostBuildEvent Condition=" '$(OS)' != 'Unix'">del "$(TargetDir)OpenTK.dll.config"
 del "$(TargetDir)OpenTK.GLControl.xml"
 del "$(TargetDir)OpenTK.xml"
 del "$(TargetDir)STROOP.exe.config"
-</PostBuildEvent>
+    </PostBuildEvent>
+    <PostBuildEvent Condition=" '$(OS)' == 'Unix'">rm -f "$(TargetDir)/OpenTK.dll.config"
+      rm -f "$(TargetDir)OpenTK.GLControl.xml"
+      rm -f "$(TargetDir)OpenTK.xml"
+      rm -f "$(TargetDir)STROOP.exe.config"
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D</PreBuildEvent>
+    <PreBuildEvent Condition=" '$(OS)' != 'Unix'">
+      xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
+    </PreBuildEvent>
+    <PreBuildEvent Condition=" '$(OS)' == 'Unix'">
+      cp -r "$(ProjectDir)Resources" "$(TargetDir)"
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
